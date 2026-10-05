@@ -4,6 +4,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) ·
 
 ## [No publicado]
 
+### Removed
+- `scripts/descargar_datos.py`: el proyecto se resuelve con MySQL, Excel y Power BI. El dataset se
+  descarga desde la fuente original (ver el README).
+
 ### Changed
 - Reestructuración del repositorio: se eliminan las carpetas intermedias de datos y las capas de
   modelado (`staging`, `marts`) y se consolida la documentación en el README y el diccionario de datos.
@@ -13,7 +17,6 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) ·
 
 ### Added
 - `docs/diccionario-de-datos.md`: diccionario de columnas y notas de calidad del dato.
-- `scripts/descargar_datos.py`: descarga y verifica el dataset original.
 
 ## [0.1.0] — Fase 0
 

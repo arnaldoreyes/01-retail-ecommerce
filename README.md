@@ -66,10 +66,12 @@ _Pendiente: se completa al cerrar el análisis._
 git clone https://github.com/arnaldoreyes/01-retail-ecommerce.git
 cd 01-retail-ecommerce
 
-# 2. Descargar el dataset original (queda en data/raw/)
-python scripts/descargar_datos.py
+# 2. Descargar el dataset desde el enlace de la fuente (ver arriba) y guardar
+#    online_retail_II.xlsx en data/raw/
 
-# 3. Exportar cada hoja del Excel a CSV UTF-8 en data/limpio/
+# 3. Abrir el archivo en Excel y guardar cada hoja como CSV UTF-8 en data/limpio/
+#      Year 2009-2010  ->  data/limpio/ventas_2009_2010.csv
+#      Year 2010-2011  ->  data/limpio/ventas_2010_2011.csv
 #    No hace falta formatear las fechas: el script de carga las convierte.
 
 # 4. Crear la tabla y cargar las dos hojas
@@ -79,7 +81,7 @@ python scripts/descargar_datos.py
 #    sql/01_perfilado.sql
 ```
 
-**Requisitos:** MySQL 8.0 + MySQL Workbench · Power BI Desktop · Excel
+**Requisitos:** MySQL 8.0 + MySQL Workbench · Excel · Power BI Desktop
 
 ---
 
@@ -97,8 +99,7 @@ python scripts/descargar_datos.py
 │   ├── 00_carga.sql             crea la tabla y carga las dos hojas
 │   └── 01_perfilado.sql         verifica la carga y explora el dato
 ├── excel/                       análisis de apoyo
-├── powerbi/                     dashboard
-└── scripts/                     descarga del dataset
+└── powerbi/                     dashboard
 ```
 
 ---

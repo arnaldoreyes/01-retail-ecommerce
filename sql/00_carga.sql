@@ -4,7 +4,8 @@
    Verificado en MySQL 8.0.46: carga 1.067.371 filas sin errores.
 
    ANTES DE EJECUTAR
-     1. Ejecuta scripts/descargar_datos.py  -> deja el .xlsx en data/raw/
+     1. Descarga online_retail_II.xlsx desde el enlace de la fuente (ver el README)
+        y guardalo en data/raw/.
      2. Abre el .xlsx en Excel y guarda cada hoja como CSV UTF-8 en data/limpio/:
           data/limpio/ventas_2009_2010.csv   (hoja "Year 2009-2010")
           data/limpio/ventas_2010_2011.csv   (hoja "Year 2010-2011")
@@ -54,13 +55,21 @@ FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES
 (invoice, stock_code, description, quantity, @fecha, price, @customer_id, country)
-SET invoice_date = STR_TO_DATE(TRIM(@fecha), '%m/%d/%y %H:%i'),
+SET invoice_date = STR_TO_DATE(TRIM(@fecha), '%m/%d/%Y %H:%i'),
     customer_id  = NULLIF(TRIM(@customer_id), ''),
     description  = NULLIF(TRIM(description), ''),
     hoja         = '2009-2010';
 
 /* ---------------------------------------------------------------------------
    CARGA DE LA HOJA 2  (mismo comando, otro archivo y otro valor de `hoja`)
+
+   OJO CON LA 'Y': el formato de fecha usa %Y (mayuscula) y no %y. La %y solo
+   acepta años de dos digitos y devuelve NULL si el CSV trae '2009'. La %Y acepta
+   las dos formas. Verificado en MySQL 8.0.46:
+       STR_TO_DATE('12/1/09 7:45',   '%m/%d/%y %H:%i')  ->  2009-12-01 07:45:00
+       STR_TO_DATE('12/1/2009 7:45', '%m/%d/%y %H:%i')  ->  NULL
+       STR_TO_DATE('12/1/09 7:45',   '%m/%d/%Y %H:%i')  ->  2009-12-01 07:45:00
+       STR_TO_DATE('12/1/2009 7:45', '%m/%d/%Y %H:%i')  ->  2009-12-01 07:45:00
    --------------------------------------------------------------------------- */
 LOAD DATA LOCAL INFILE 'C:/ruta/a/tu/proyecto/data/limpio/ventas_2010_2011.csv'
 INTO TABLE ventas
@@ -68,7 +77,7 @@ FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES
 (invoice, stock_code, description, quantity, @fecha, price, @customer_id, country)
-SET invoice_date = STR_TO_DATE(TRIM(@fecha), '%m/%d/%y %H:%i'),
+SET invoice_date = STR_TO_DATE(TRIM(@fecha), '%m/%d/%Y %H:%i'),
     customer_id  = NULLIF(TRIM(@customer_id), ''),
     description  = NULLIF(TRIM(description), ''),
     hoja         = '2010-2011';
