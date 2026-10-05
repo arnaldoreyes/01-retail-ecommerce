@@ -8,10 +8,8 @@ GitHub no es un disco duro: un archivo de 43 MB hace el repositorio lento y dif�
 
 ## Cómo obtenerlo
 
-```bash
-python scripts/descargar_datos.py
-```
+Descárgalo desde el enlace de la fuente que está en el [README](../../README.md) y guárdalo en esta carpeta.
 
-El script descarga la fuente oficial, extrae el archivo y verifica que esté completo.
+El proyecto se resuelve con **MySQL, Excel y Power BI**: no se usa ningún script para traer los datos.
 
 **Fuente y licencia:** Online Retail II, UCI Machine Learning Repository, CC BY 4.0. Ver [`docs/diccionario-de-datos.md`](../../docs/diccionario-de-datos.md).

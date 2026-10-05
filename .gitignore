@@ -22,7 +22,7 @@ misc/
 *.accdb
 *.parquet
 
-# --- Power BI / Excel: archivos temporales ---
+# --- Excel y Power BI: archivos temporales ---
 ~$*.xlsx
 ~$*.xls
 ~$*.pbix
@@ -30,15 +30,6 @@ misc/
 **/.pbi/
 **/.pbi/localSettings.json
 *.tmp
-
-# --- Python ---
-__pycache__/
-*.py[cod]
-.ipynb_checkpoints/
-.venv/
-venv/
-env/
-*.egg-info/
 
 # --- Salidas pesadas ---
 *.zip

@@ -26,15 +26,13 @@ is at risk?
 
 ## How to reproduce
 
-```bash
-git clone https://github.com/arnaldoreyes/01-retail-ecommerce.git
-cd 01-retail-ecommerce
-python scripts/descargar_datos.py      # downloads the dataset into data/raw/
-# export each Excel sheet as UTF-8 CSV into data/limpio/
-# run sql/00_carga.sql, then sql/01_perfilado.sql
-```
+1. Clone the repository.
+2. Download the dataset from the source link above and save `online_retail_II.xlsx` into `data/raw/`.
+3. Open the file in Excel and save each sheet as UTF-8 CSV into `data/limpio/`.
+4. Run `sql/00_carga.sql` in MySQL Workbench (creates the table and loads both sheets).
+5. Run `sql/01_perfilado.sql` to verify the load and profile the data.
 
-**Requirements:** MySQL 8.0 + MySQL Workbench · Power BI Desktop · Excel
+**Requirements:** MySQL 8.0 + MySQL Workbench · Excel · Power BI Desktop
 
 ---
 
