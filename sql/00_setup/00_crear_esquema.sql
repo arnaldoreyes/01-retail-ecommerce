@@ -5,6 +5,14 @@
    Objetivo : crear la base de datos y las tablas de trabajo del proyecto.
    Regla    : el script se puede correr varias veces sin romperse.
 
+   ATENCION A LOS NOMBRES DE COLUMNA
+   El archivo original nombra los campos: Invoice, StockCode, Description,
+   Quantity, InvoiceDate, Price, Customer ID, Country.
+   Es decir: `Invoice` (NO InvoiceNo) y `Price` (NO UnitPrice).
+   Muchos tutoriales usan la version antigua del dataset, de una sola hoja, donde
+   esos dos campos SI se llaman InvoiceNo y UnitPrice. Si copias codigo de ahi,
+   no te va a correr y vas a perder media hora averiguando por que.
+
    COMO USARLO
      1. Abre MySQL Workbench y conectate a tu servidor local.
      2. File > Open SQL Script... y abre este archivo.
@@ -24,16 +32,15 @@ USE portafolio_retail;
 -- ============================================================================
 DROP TABLE IF EXISTS stg_ventas_2009_2010;
 CREATE TABLE stg_ventas_2009_2010 (
-  -- TODO (Fase 1): confirma los nombres y tipos REALES del dataset.
   -- Carga todo como texto en la primera pasada: asi decides TU, y no el motor,
   -- que filas son validas. El tipado fino es la Fase 2.
-  invoice_no    VARCHAR(20)   NULL,   -- ojo: los que empiezan con 'C' son cancelaciones
+  invoice       VARCHAR(20)   NULL,   -- ojo: los que empiezan con 'C' son cancelaciones
   stock_code    VARCHAR(20)   NULL,   -- ojo: POST, D, M, BANK CHARGES no son productos
   description   VARCHAR(120)  NULL,
   quantity      INT           NULL,   -- negativo = devolucion
   invoice_date  DATETIME      NULL,
-  unit_price    DECIMAL(18,4) NULL,   -- 0 = cortesia, puede ser negativo
-  customer_id   INT           NULL,   -- ~25% vacio: decision clave del proyecto
+  price         DECIMAL(18,4) NULL,   -- 0 = cortesia, puede ser negativo
+  customer_id   INT           NULL,   -- ~23% vacio: decision clave del proyecto
   country       VARCHAR(60)   NULL,
   fila_origen   INT           NULL,   -- numero de fila del CSV: sirve para auditar
   cargado_en    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -70,7 +77,8 @@ CREATE TABLE dq_reglas (
 
       A) Interfaz grafica (mas facil):
          En MySQL Workbench: clic derecho sobre la tabla > Table Data Import Wizard >
-         selecciona el CSV > mapea las columnas > Next.
+         selecciona el CSV > mapea las columnas (incluido "Customer ID" -> customer_id)
+         > Next.
 
       B) LOAD DATA (mas rapido y repetible):
          SET GLOBAL local_infile = 1;   -- requiere tambien local_infile=1 en el cliente
@@ -79,7 +87,7 @@ CREATE TABLE dq_reglas (
          FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
          LINES TERMINATED BY '\r\n'
          IGNORE 1 LINES
-         (invoice_no, stock_code, description, quantity, invoice_date, unit_price,
+         (invoice, stock_code, description, quantity, invoice_date, price,
           customer_id, country);
 
    4) VERIFICA EL CONTEO despues de cargar:

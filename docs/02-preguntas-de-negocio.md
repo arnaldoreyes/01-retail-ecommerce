@@ -25,7 +25,7 @@
 - **Pregunta del cliente:** *"El sistema me dice que vendí X. Yo quiero saber cuánto me quedó de verdad, después de cancelaciones y devoluciones, y si estoy creciendo o solo me muevo."*
 - **Decisión que cambia:** si fija el objetivo de venta del próximo trimestre sobre cifras brutas o netas.
 - **Entregable:** `sql/30_analisis/10_kpis_comerciales.sql` + gráfico de evolución mensual en el dashboard.
-- **KPI:** `Venta bruta = SUM(Quantity * UnitPrice)` sobre ventas · `Devoluciones = SUM(...)` sobre facturas `C` y cantidades negativas · `Venta neta = bruta - devoluciones` · `Tasa de devolución = devoluciones / bruta`.
+- **KPI:** `Venta bruta = SUM(quantity * price)` sobre ventas · `Devoluciones = SUM(...)` sobre facturas `C` y cantidades negativas · `Venta neta = bruta - devoluciones` · `Tasa de devolución = devoluciones / bruta`.
 - **Grano:** mes × país. Además, versión por semana para ver la tendencia fina.
 - **Trampa:** no separar cancelaciones; comparar diciembre 2011 (incompleto) contra diciembre 2010; contar líneas de ajuste contable como ventas.
 - **Criterio de aceptación:** la venta neta está validada contra un segundo cálculo (una tabla dinámica en Excel) y la diferencia es cero o está explicada.
