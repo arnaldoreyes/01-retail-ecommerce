@@ -43,7 +43,7 @@
 - **Entregable:** `sql/30_analisis/20_pareto_clientes.sql` + tabla de clientes ordenados por venta neta con % acumulado.
 - **KPI:** `% del ingreso que aporta el top 10 / 20 / 50` · `Ingreso acumulado (running total)` · `Índice de concentración`.
 - **Grano:** cliente.
-- **Trampa:** calcular el Pareto sobre las líneas sin haber decidido antes qué es "venta neta"; ordenar por número de pedidos en lugar de por ingreso; no excluir los `Customer ID` nulos y luego preguntarse por qué el total no cuadra.
+- **Trampa:** calcular el Pareto sobre las líneas sin haber decidido antes qué es "venta neta"; ordenar por número de pedidos en lugar de por ingreso; no excluir los `customer_id` nulos (en el archivo original, `Customer ID`) y luego preguntarse por qué el total no cuadra.
 - **Criterio de aceptación:** puedes decir en una frase *"N clientes = X% del ingreso"* y el acumulado cierra en 100%.
 
 ---
