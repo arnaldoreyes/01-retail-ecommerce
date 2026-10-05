@@ -1,66 +1,92 @@
 /* ============================================================================
    00_setup / 00_crear_esquema.sql
-   ----------------------------------------------------------------------------
-   Objetivo : crear el esquema del proyecto y las tablas de trabajo.
-   Dialecto : SQL Server (T-SQL). Al final esta la variante PostgreSQL.
-   Regla    : el script debe poder correrse varias veces sin romperse (idempotente).
+   Proyecto : 01 - Retail / Online Retail II
+   Motor    : MySQL 8.0  (MySQL Workbench)
+   Objetivo : crear la base de datos y las tablas de trabajo del proyecto.
+   Regla    : el script se puede correr varias veces sin romperse.
 
-   TODO (Fase 1): reemplaza los nombres y tipos por los de TU dataset.
-   Este archivo NO es la respuesta, es el molde. La primera vez que lo corras
-   vas a tener que decidir el tipo de dato de cada columna: eso es parte del
-   trabajo de perfilado y es exactamente lo que evaluan en una entrevista.
+   COMO USARLO
+     1. Abre MySQL Workbench y conectate a tu servidor local.
+     2. File > Open SQL Script... y abre este archivo.
+     3. Ejecuta TODO el script (icono del rayo).
    ============================================================================ */
 
--- 1. Esquemas: separa cada capa para que se vea el flujo del dato.
-IF SCHEMA_ID('stg') IS NULL EXEC('CREATE SCHEMA stg');   -- copia fiel del crudo, ya tipada
-IF SCHEMA_ID('marts') IS NULL EXEC('CREATE SCHEMA marts'); -- modelo de negocio (dim / fact)
-IF SCHEMA_ID('dq') IS NULL EXEC('CREATE SCHEMA dq');     -- chequeos de calidad de datos
-GO
+CREATE DATABASE IF NOT EXISTS portafolio_retail
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE portafolio_retail;
 
--- 2. Tabla de staging: una columna por cada columna del archivo origen.
---    Usa tipos generosos al inicio (NVARCHAR(255)); en la Fase 2 ajustas.
-IF OBJECT_ID('stg.tabla_origen', 'U') IS NOT NULL DROP TABLE stg.tabla_origen;
-GO
-CREATE TABLE stg.tabla_origen (
-    -- TODO: una linea por columna del origen, con el mismo nombre.
-    -- Ejemplo:
-    -- id_registro      NVARCHAR(50)  NULL,
-    -- fecha_evento     DATETIME2(0)  NULL,
-    -- cantidad         INT           NULL,
-    -- precio_unitario  DECIMAL(18,4) NULL,
-    -- cliente_id       NVARCHAR(50)  NULL,
-    _fila_origen       INT           NULL,  -- numero de fila del archivo: sirve para auditar
-    _cargado_en        DATETIME2(0)  NOT NULL DEFAULT SYSDATETIME()
-);
-GO
+/* MySQL no maneja "esquemas" separados como SQL Server: se usa el prefijo en el
+   nombre de la tabla (stg_ / mart_ / dq_). Es la convencion mas clara y legible
+   cuando alguien entra a revisar tu modelo. */
 
--- 3. Bitacora de calidad: cada regla de limpieza que aplicas queda registrada.
-IF OBJECT_ID('dq.reglas', 'U') IS NOT NULL DROP TABLE dq.reglas;
-GO
-CREATE TABLE dq.reglas (
-    id_regla        INT IDENTITY(1,1) PRIMARY KEY,
-    nombre          NVARCHAR(120) NOT NULL,
-    descripcion     NVARCHAR(400) NOT NULL,
-    filas_afectadas INT           NULL,
-    decision        NVARCHAR(200) NULL,  -- que hice con esas filas y por que
-    fecha           DATETIME2(0)  NOT NULL DEFAULT SYSDATETIME()
-);
-GO
+-- ============================================================================
+-- CAPA 1 · STAGING: copia fiel del archivo original, ya tipada.
+-- ============================================================================
+DROP TABLE IF EXISTS stg_ventas_2009_2010;
+CREATE TABLE stg_ventas_2009_2010 (
+  -- TODO (Fase 1): confirma los nombres y tipos REALES del dataset.
+  -- Carga todo como texto en la primera pasada: asi decides TU, y no el motor,
+  -- que filas son validas. El tipado fino es la Fase 2.
+  invoice_no    VARCHAR(20)   NULL,   -- ojo: los que empiezan con 'C' son cancelaciones
+  stock_code    VARCHAR(20)   NULL,   -- ojo: POST, D, M, BANK CHARGES no son productos
+  description   VARCHAR(120)  NULL,
+  quantity      INT           NULL,   -- negativo = devolucion
+  invoice_date  DATETIME      NULL,
+  unit_price    DECIMAL(18,4) NULL,   -- 0 = cortesia, puede ser negativo
+  customer_id   INT           NULL,   -- ~25% vacio: decision clave del proyecto
+  country       VARCHAR(60)   NULL,
+  fila_origen   INT           NULL,   -- numero de fila del CSV: sirve para auditar
+  cargado_en    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 
-/* ---------------------------------------------------------------------------
-   VARIANTE PostgreSQL (por si el proyecto se monta en Postgres)
-   ---------------------------------------------------------------------------
-   CREATE SCHEMA IF NOT EXISTS stg;
-   CREATE SCHEMA IF NOT EXISTS marts;
-   CREATE SCHEMA IF NOT EXISTS dq;
+DROP TABLE IF EXISTS stg_ventas_2010_2011;
+CREATE TABLE stg_ventas_2010_2011 LIKE stg_ventas_2009_2010;
 
-   CREATE TABLE IF NOT EXISTS stg.tabla_origen (
-       id_registro     TEXT,
-       fecha_evento    TIMESTAMP,
-       cantidad        INTEGER,
-       precio_unitario NUMERIC(18,4),
-       cliente_id      TEXT,
-       _fila_origen    INTEGER,
-       _cargado_en     TIMESTAMP NOT NULL DEFAULT NOW()
-   );
-   --------------------------------------------------------------------------- */
+-- ============================================================================
+-- CAPA 2 · BITACORA DE CALIDAD: cada regla de limpieza que aplicas.
+-- Si no esta aqui, no existe. Es tu defensa en la entrevista.
+-- ============================================================================
+DROP TABLE IF EXISTS dq_reglas;
+CREATE TABLE dq_reglas (
+  id_regla        INT AUTO_INCREMENT PRIMARY KEY,
+  nombre          VARCHAR(120) NOT NULL,
+  descripcion     VARCHAR(400) NOT NULL,
+  filas_afectadas INT          NULL,
+  decision        VARCHAR(200) NULL,   -- que hice con esas filas y POR QUE
+  fecha           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+/* ============================================================================
+   NOTAS DE CARGA (Fase 1)
+   ----------------------------------------------------------------------------
+   El archivo original es un .xlsx de 43 MB con DOS hojas. Pasos:
+
+   1) Abre online_retail_II.xlsx en Excel.
+   2) Guarda la hoja "Year 2009-2010" como CSV UTF-8 en data/staging/.
+      Guarda la hoja "Year 2010-2011" como CSV UTF-8 en data/staging/.
+      (Son ~500.000 filas cada una: Excel lo hace, pero tarda.)
+
+   3) Carga en MySQL. Dos caminos:
+
+      A) Interfaz grafica (mas facil):
+         En MySQL Workbench: clic derecho sobre la tabla > Table Data Import Wizard >
+         selecciona el CSV > mapea las columnas > Next.
+
+      B) LOAD DATA (mas rapido y repetible):
+         SET GLOBAL local_infile = 1;   -- requiere tambien local_infile=1 en el cliente
+         LOAD DATA LOCAL INFILE 'C:/ruta/data/staging/ventas_2009_2010.csv'
+         INTO TABLE stg_ventas_2009_2010
+         FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+         LINES TERMINATED BY '\r\n'
+         IGNORE 1 LINES
+         (invoice_no, stock_code, description, quantity, invoice_date, unit_price,
+          customer_id, country);
+
+   4) VERIFICA EL CONTEO despues de cargar:
+         SELECT COUNT(*) FROM stg_ventas_2009_2010;
+         SELECT COUNT(*) FROM stg_ventas_2010_2011;
+      Si no coincide con el origen, PARA y averigua por que antes de seguir.
+      Esa es tu primera regla en dq_reglas.
+
+   5) Comprueba el solape de diciembre de 2010 entre las dos hojas ANTES de unirlas.
+   ============================================================================ */

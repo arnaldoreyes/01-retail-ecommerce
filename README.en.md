@@ -89,10 +89,13 @@ cd 01-retail-ecommerce
 git checkout develop
 python tools/descargar_datasets.py   # downloads the original dataset
 # copy online_retail_II.xlsx into data/raw/
-# run sql/00_setup/00_crear_esquema.sql, then 10_staging -> 20_marts -> 30_analisis
+# save each Excel sheet as UTF-8 CSV into data/staging/
+# run sql/00_setup/00_crear_esquema.sql in MySQL Workbench (creates portafolio_retail)
+# load the CSVs into stg_ventas_2009_2010 / stg_ventas_2010_2011 and verify the row count
+# then run 10_staging -> 20_marts -> 30_analisis
 ```
 
-**Requirements:** SQL Server 2019+ (or PostgreSQL 14+), Power BI Desktop, Excel.
+**Requirements:** MySQL 8.0 + MySQL Workbench, Power BI Desktop, Excel.
 
 ---
 

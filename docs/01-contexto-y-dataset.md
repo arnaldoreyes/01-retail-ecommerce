@@ -104,18 +104,16 @@ Cada punto es una decisión que **debes** tomar, documentar en `docs/03-bitacora
 
 ## 6. Cómo cargar los datos
 
-**Opción A — SQL Server (recomendada)**
+**Motor del proyecto: MySQL 8.0 con MySQL Workbench** (ya está instalado y el servicio está corriendo).
+
 1. Copia `online_retail_II.xlsx` desde `_datasets/online-retail-ii/` a `data/raw/`.
-2. Abre el archivo en Excel y guarda cada hoja como CSV (UTF-8) en `data/staging/`. Son ~1 M de filas: guarda en `.csv`, no en `.xlsx`.
-3. Crea el esquema con `sql/00_setup/00_crear_esquema.sql`.
-4. Carga los CSV con el *Import Flat File Wizard* de SSMS hacia `stg.ventas_2009_2010` y `stg.ventas_2010_2011`. Carga **todo como texto** en esta primera pasada: no quieres que el importador decida los tipos por ti.
-5. En la Fase 2 conviertes los tipos con `TRY_CONVERT` y registras en `dq.reglas` cuántas filas fallaron.
+2. Abre el archivo en Excel y guarda **cada hoja** como CSV UTF-8 en `data/staging/`. Son ~500.000 filas por hoja: guarda en `.csv`, nunca en `.xlsx`.
+3. En MySQL Workbench, abre y ejecuta `sql/00_setup/00_crear_esquema.sql`. Eso crea la base `portafolio_retail` y las tablas `stg_ventas_2009_2010`, `stg_ventas_2010_2011` y `dq_reglas`.
+4. Carga cada CSV con el **Table Data Import Wizard** (clic derecho sobre la tabla → Table Data Import Wizard) o con `LOAD DATA LOCAL INFILE` (el script trae el ejemplo exacto). Carga **todo como texto** en esta primera pasada: no quieres que el motor decida los tipos por ti.
+5. **Verifica el conteo de filas** después de cada carga y anótalo en `dq_reglas`. Si no cuadra con el origen, para y averigua por qué antes de seguir.
+6. En la Fase 2 conviertes los tipos definitivos y registras cuántas filas fallaron.
 
-**Opción B — Power BI directo a Excel**
-Sirve para el dashboard, pero **no** para aprender SQL. El objetivo del proyecto es demostrar que modelas en base de datos; usa la opción A y deja Power BI para la Fase 4.
-
-**Opción C — PostgreSQL**
-Mismo flujo con `COPY tabla FROM 'archivo.csv' WITH (FORMAT csv, HEADER true);`. Usa la variante al final de `00_crear_esquema.sql`.
+**Por qué no cargar los datos desde Power BI:** sirve para el dashboard, pero **no** para aprender SQL. El objetivo del proyecto es demostrar que modelas en base de datos; usa MySQL y deja Power BI para la Fase 4.
 
 ---
 
