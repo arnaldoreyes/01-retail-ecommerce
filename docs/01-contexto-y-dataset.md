@@ -99,6 +99,7 @@ Cada punto es una decisión que **debes** tomar, documentar en `docs/03-bitacora
 3. **`invoice` con `C` = cancelación.** Son facturas que se anularon. Si sumas `quantity` sin separarlas, mezclas venta con devolución. Lo correcto es calcular **venta bruta** y **devoluciones** por separado, y de ahí la **venta neta**.
 
 4. **`customer_id` vacío (22,8% de las líneas).** No son "clientes invitados": en un mayorista son, casi siempre, ventas de mostrador o pedidos sin cuenta. Si los eliminas, pierdes ingresos reales; si los dejas, arruinas cualquier análisis por cliente. → **Decisión obligatoria:** justifica si los excluyes de los análisis de cliente (no de los de facturación) y cuánto ingreso representan.
+   ⚠️ **Y antes de decidir nada, comprueba que el vacío siga siendo un vacío.** Si cargas ese campo directo a una columna `INT`, MySQL convierte cada `Customer ID` vacío en **0** y te inventa un cliente falso llamado "0" con 243.007 filas y alrededor de 1,7 millones de libras de facturación. Ese cero aparecería como **tu mejor cliente** en el Pareto y en el RFM. Se evita con el patrón `NULLIF` que está documentado en `sql/00_setup/00_crear_esquema.sql`, y se comprueba con el chequeo 09 de `sql/00_setup/01_validar_carga.sql`. *(Reproducido y medido en MySQL 8.0.46.)*
 
 5. **`description` nulo o inconsistente.** Un mismo `stock_code` puede aparecer con descripciones distintas. Agrupa siempre por `stock_code`, nunca por `description`.
 

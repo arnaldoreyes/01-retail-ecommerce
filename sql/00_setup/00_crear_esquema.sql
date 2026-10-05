@@ -75,26 +75,48 @@ CREATE TABLE dq_reglas (
 
    3) Carga en MySQL. Dos caminos:
 
-      A) Interfaz grafica (mas facil):
+      A) Interfaz grafica (ojo con los vacios):
          En MySQL Workbench: clic derecho sobre la tabla > Table Data Import Wizard >
          selecciona el CSV > mapea las columnas (incluido "Customer ID" -> customer_id)
-         > Next.
+         > Next. El wizard puede convertir los campos vacios de customer_id en 0 en
+         vez de NULL: despues de cargar, comprueba el paso 5.
 
-      B) LOAD DATA (mas rapido y repetible):
-         SET GLOBAL local_infile = 1;   -- requiere tambien local_infile=1 en el cliente
+      B) LOAD DATA (mas rapido, repetible y sin sorpresas):
+         SET GLOBAL local_infile = 1;
+
          LOAD DATA LOCAL INFILE 'C:/ruta/data/staging/ventas_2009_2010.csv'
          INTO TABLE stg_ventas_2009_2010
          FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
          LINES TERMINATED BY '\r\n'
          IGNORE 1 LINES
          (invoice, stock_code, description, quantity, invoice_date, price,
-          customer_id, country);
+          @customer_id, country)
+         SET customer_id = NULLIF(TRIM(@customer_id), ''),
+             description = NULLIF(TRIM(description), '');
 
-   4) VERIFICA EL CONTEO despues de cargar:
-         SELECT COUNT(*) FROM stg_ventas_2009_2010;
-         SELECT COUNT(*) FROM stg_ventas_2010_2011;
-      Si no coincide con el origen, PARA y averigua por que antes de seguir.
-      Esa es tu primera regla en dq_reglas.
+         LO MISMO para la segunda hoja, apuntando a stg_ventas_2010_2011.
 
-   5) Comprueba el solape de diciembre de 2010 entre las dos hojas ANTES de unirlas.
+   4) POR QUE EL NULLIF NO ES OPCIONAL
+      El CSV tiene 243.007 filas SIN Customer ID: el campo viene vacio. Si cargas
+      directo a una columna INT, MySQL convierte ese vacio en 0 y te crea un
+      CLIENTE FALSO llamado "0" con ~243.000 filas y alrededor de 1,7 millones de
+      libras de facturacion. Ese cliente falso aparece como TU MEJOR CLIENTE en el
+      analisis Pareto y arruina toda la segmentacion RFM.
+
+      Reproducido en MySQL 8.0.46: sin NULLIF quedan 107.927 filas con
+      customer_id = 0 en la primera hoja (20,54% del total, 1.191.276,06 GBP) y
+      CERO valores NULL. Y lo peligroso es que queda invisible: no hay ningun nulo
+      que decidir, porque el nulo se disfrazo de cero.
+
+   5) VERIFICA. Los numeros tienen que dar esto:
+         SELECT COUNT(*) FROM stg_ventas_2009_2010;                 -- 525.461
+         SELECT COUNT(*) FROM stg_ventas_2010_2011;                 -- 541.910
+         SELECT SUM(customer_id IS NULL) FROM stg_ventas_2009_2010;
+         SELECT SUM(customer_id IS NULL) FROM stg_ventas_2010_2011;  -- suman 243.007
+         SELECT SUM(customer_id = 0) FROM stg_ventas_2009_2010;      -- 0
+         SELECT SUM(customer_id = 0) FROM stg_ventas_2010_2011;      -- 0
+      Si `customer_id = 0` devuelve algo distinto de cero, recarga con NULLIF.
+      El script sql/00_setup/01_validar_carga.sql hace los tres chequeos de golpe.
+
+   6) Comprueba el solape de diciembre de 2010 entre las dos hojas ANTES de unirlas.
    ============================================================================ */
