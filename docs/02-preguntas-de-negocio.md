@@ -5,6 +5,10 @@
 
 **Regla de oro:** si la respuesta a una pregunta no cambia ninguna decisión del negocio, la pregunta no vale la pena. No la incluyas.
 
+> **Dos aclaraciones antes de empezar**
+> 1. Los archivos que aparecen como *Entregable* (`sql/30_analisis/...`) **todavía no existen**: se crean en la Fase 3. Son el destino de cada pregunta, no un enlace roto.
+> 2. Los nombres que verás escritos como en el archivo original — `Customer ID`, `StockCode`, `Description`, `InvoiceNo`, `UnitPrice` — se llaman en la base **`customer_id`, `stock_code`, `description`, `invoice`, `price`**. El mapeo completo está en [`docs/01-contexto-y-dataset.md`](01-contexto-y-dataset.md). **Cuando escribas SQL, usa siempre el nombre de la base.**
+
 ---
 
 ## Estructura de cada pregunta
@@ -25,7 +29,7 @@
 - **Pregunta del cliente:** *"El sistema me dice que vendí X. Yo quiero saber cuánto me quedó de verdad, después de cancelaciones y devoluciones, y si estoy creciendo o solo me muevo."*
 - **Decisión que cambia:** si fija el objetivo de venta del próximo trimestre sobre cifras brutas o netas.
 - **Entregable:** `sql/30_analisis/10_kpis_comerciales.sql` + gráfico de evolución mensual en el dashboard.
-- **KPI:** `Venta bruta = SUM(Quantity * UnitPrice)` sobre ventas · `Devoluciones = SUM(...)` sobre facturas `C` y cantidades negativas · `Venta neta = bruta - devoluciones` · `Tasa de devolución = devoluciones / bruta`.
+- **KPI:** `Venta bruta = SUM(quantity * price)` sobre ventas · `Devoluciones = SUM(...)` sobre facturas `C` y cantidades negativas · `Venta neta = bruta - devoluciones` · `Tasa de devolución = devoluciones / bruta`.
 - **Grano:** mes × país. Además, versión por semana para ver la tendencia fina.
 - **Trampa:** no separar cancelaciones; comparar diciembre 2011 (incompleto) contra diciembre 2010; contar líneas de ajuste contable como ventas.
 - **Criterio de aceptación:** la venta neta está validada contra un segundo cálculo (una tabla dinámica en Excel) y la diferencia es cero o está explicada.

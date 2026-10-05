@@ -87,8 +87,7 @@ Analysis of 1,067,371 invoice lines from a UK online retailer (Dec 2009 – Dec 
 git clone <repo-url>
 cd 01-retail-ecommerce
 git checkout develop
-python tools/descargar_datasets.py   # downloads the original dataset
-# copy online_retail_II.xlsx into data/raw/
+python scripts/descargar_datos.py    # downloads the dataset into data/raw/
 # save each Excel sheet as UTF-8 CSV into data/staging/
 # run sql/00_setup/00_crear_esquema.sql in MySQL Workbench (creates portafolio_retail)
 # load the CSVs into stg_ventas_2009_2010 / stg_ventas_2010_2011 and verify the row count

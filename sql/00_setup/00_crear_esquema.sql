@@ -5,6 +5,14 @@
    Objetivo : crear la base de datos y las tablas de trabajo del proyecto.
    Regla    : el script se puede correr varias veces sin romperse.
 
+   ATENCION A LOS NOMBRES DE COLUMNA
+   El archivo original nombra los campos: Invoice, StockCode, Description,
+   Quantity, InvoiceDate, Price, Customer ID, Country.
+   Es decir: `Invoice` (NO InvoiceNo) y `Price` (NO UnitPrice).
+   Muchos tutoriales usan la version antigua del dataset, de una sola hoja, donde
+   esos dos campos SI se llaman InvoiceNo y UnitPrice. Si copias codigo de ahi,
+   no te va a correr y vas a perder media hora averiguando por que.
+
    COMO USARLO
      1. Abre MySQL Workbench y conectate a tu servidor local.
      2. File > Open SQL Script... y abre este archivo.
@@ -24,16 +32,15 @@ USE portafolio_retail;
 -- ============================================================================
 DROP TABLE IF EXISTS stg_ventas_2009_2010;
 CREATE TABLE stg_ventas_2009_2010 (
-  -- TODO (Fase 1): confirma los nombres y tipos REALES del dataset.
   -- Carga todo como texto en la primera pasada: asi decides TU, y no el motor,
   -- que filas son validas. El tipado fino es la Fase 2.
-  invoice_no    VARCHAR(20)   NULL,   -- ojo: los que empiezan con 'C' son cancelaciones
+  invoice       VARCHAR(20)   NULL,   -- ojo: los que empiezan con 'C' son cancelaciones
   stock_code    VARCHAR(20)   NULL,   -- ojo: POST, D, M, BANK CHARGES no son productos
   description   VARCHAR(120)  NULL,
   quantity      INT           NULL,   -- negativo = devolucion
   invoice_date  DATETIME      NULL,
-  unit_price    DECIMAL(18,4) NULL,   -- 0 = cortesia, puede ser negativo
-  customer_id   INT           NULL,   -- ~25% vacio: decision clave del proyecto
+  price         DECIMAL(18,4) NULL,   -- 0 = cortesia, puede ser negativo
+  customer_id   INT           NULL,   -- ~23% vacio: decision clave del proyecto
   country       VARCHAR(60)   NULL,
   fila_origen   INT           NULL,   -- numero de fila del CSV: sirve para auditar
   cargado_en    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -68,25 +75,48 @@ CREATE TABLE dq_reglas (
 
    3) Carga en MySQL. Dos caminos:
 
-      A) Interfaz grafica (mas facil):
+      A) Interfaz grafica (ojo con los vacios):
          En MySQL Workbench: clic derecho sobre la tabla > Table Data Import Wizard >
-         selecciona el CSV > mapea las columnas > Next.
+         selecciona el CSV > mapea las columnas (incluido "Customer ID" -> customer_id)
+         > Next. El wizard puede convertir los campos vacios de customer_id en 0 en
+         vez de NULL: despues de cargar, comprueba el paso 5.
 
-      B) LOAD DATA (mas rapido y repetible):
-         SET GLOBAL local_infile = 1;   -- requiere tambien local_infile=1 en el cliente
+      B) LOAD DATA (mas rapido, repetible y sin sorpresas):
+         SET GLOBAL local_infile = 1;
+
          LOAD DATA LOCAL INFILE 'C:/ruta/data/staging/ventas_2009_2010.csv'
          INTO TABLE stg_ventas_2009_2010
          FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
          LINES TERMINATED BY '\r\n'
          IGNORE 1 LINES
-         (invoice_no, stock_code, description, quantity, invoice_date, unit_price,
-          customer_id, country);
+         (invoice, stock_code, description, quantity, invoice_date, price,
+          @customer_id, country)
+         SET customer_id = NULLIF(TRIM(@customer_id), ''),
+             description = NULLIF(TRIM(description), '');
 
-   4) VERIFICA EL CONTEO despues de cargar:
-         SELECT COUNT(*) FROM stg_ventas_2009_2010;
-         SELECT COUNT(*) FROM stg_ventas_2010_2011;
-      Si no coincide con el origen, PARA y averigua por que antes de seguir.
-      Esa es tu primera regla en dq_reglas.
+         LO MISMO para la segunda hoja, apuntando a stg_ventas_2010_2011.
 
-   5) Comprueba el solape de diciembre de 2010 entre las dos hojas ANTES de unirlas.
+   4) POR QUE EL NULLIF NO ES OPCIONAL
+      El CSV tiene 243.007 filas SIN Customer ID: el campo viene vacio. Si cargas
+      directo a una columna INT, MySQL convierte ese vacio en 0 y te crea un
+      CLIENTE FALSO llamado "0" con ~243.000 filas y alrededor de 1,7 millones de
+      libras de facturacion. Ese cliente falso aparece como TU MEJOR CLIENTE en el
+      analisis Pareto y arruina toda la segmentacion RFM.
+
+      Reproducido en MySQL 8.0.46: sin NULLIF quedan 107.927 filas con
+      customer_id = 0 en la primera hoja (20,54% del total, 1.191.276,06 GBP) y
+      CERO valores NULL. Y lo peligroso es que queda invisible: no hay ningun nulo
+      que decidir, porque el nulo se disfrazo de cero.
+
+   5) VERIFICA. Los numeros tienen que dar esto:
+         SELECT COUNT(*) FROM stg_ventas_2009_2010;                 -- 525.461
+         SELECT COUNT(*) FROM stg_ventas_2010_2011;                 -- 541.910
+         SELECT SUM(customer_id IS NULL) FROM stg_ventas_2009_2010;
+         SELECT SUM(customer_id IS NULL) FROM stg_ventas_2010_2011;  -- suman 243.007
+         SELECT SUM(customer_id = 0) FROM stg_ventas_2009_2010;      -- 0
+         SELECT SUM(customer_id = 0) FROM stg_ventas_2010_2011;      -- 0
+      Si `customer_id = 0` devuelve algo distinto de cero, recarga con NULLIF.
+      El script sql/00_setup/01_validar_carga.sql hace los tres chequeos de golpe.
+
+   6) Comprueba el solape de diciembre de 2010 entre las dos hojas ANTES de unirlas.
    ============================================================================ */

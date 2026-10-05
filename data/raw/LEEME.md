@@ -14,6 +14,10 @@ El `raw/` es la evidencia: si alguien duda de tu resultado, puede volver al orig
 
 ## Como obtener el original
 
-El script `tools/descargar_datasets.py` del portafolio descarga la fuente oficial y verifica el contenido. Copia el archivo que necesites a `raw/`.
+El script `scripts/descargar_datos.py` de **este mismo repositorio** descarga la fuente oficial, extrae los archivos y verifica que estén completos (conteo de filas incluido). No necesita nada instalado más que Python.
+
+```bash
+python scripts/descargar_datos.py
+```
 
 **Fuente y licencia:** ver `docs/01-contexto-y-dataset.md`. UCI Machine Learning Repository, licencia CC BY 4.0 — se debe citar la fuente.
