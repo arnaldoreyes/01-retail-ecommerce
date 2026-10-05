@@ -69,9 +69,33 @@ CREATE TABLE dq_reglas (
    El archivo original es un .xlsx de 43 MB con DOS hojas. Pasos:
 
    1) Abre online_retail_II.xlsx en Excel.
-   2) Guarda la hoja "Year 2009-2010" como CSV UTF-8 en data/staging/.
+   2) CUIDADO CON LA FECHA. La columna InvoiceDate viene con formato 'm/d/yy h:mm'
+      (verificado leyendo el .xlsx). Y si la cargas asi, MySQL NO te da error:
+      la corrompe en silencio. Reproducido en MySQL 8.0.46:
+
+         '12/1/09 7:45'    ->  '2012-01-09 07:45:00'   (ano corrido, mes y dia invertidos)
+         '12/31/10 14:05'  ->  '0000-00-00 00:00:00'   (no la pudo interpretar)
+
+      Tienes dos caminos:
+
+      A) Reformatear antes de exportar:
+         Columna E completa > Formato de celdas > Personalizada > yyyy-mm-dd hh:mm:ss
+         Debe verse: 2009-12-01 07:45:00
+         Despues ABRE EL CSV EN EL BLOC DE NOTAS y confirma las 2 primeras lineas.
+
+      B) No tocar Excel y convertir tu mismo durante la carga (a prueba de balas,
+         mismo patron que ya usas para customer_id). VERIFICADO: da las fechas exactas.
+
+            (invoice, stock_code, description, quantity, @fecha, price, @customer_id, country)
+            SET invoice_date = STR_TO_DATE(TRIM(@fecha), '%m/%d/%y %H:%i'),
+                customer_id  = NULLIF(TRIM(@customer_id), ''),
+                description  = NULLIF(TRIM(description), '');
+
+      Guarda la hoja "Year 2009-2010" como CSV UTF-8 en data/staging/.
       Guarda la hoja "Year 2010-2011" como CSV UTF-8 en data/staging/.
       (Son ~500.000 filas cada una: Excel lo hace, pero tarda.)
+
+      El script 01_validar_carga.sql detecta esta falla en los chequeos 06, 07 y 08.
 
    3) Carga en MySQL. Dos caminos:
 
