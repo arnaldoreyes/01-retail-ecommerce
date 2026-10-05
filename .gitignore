@@ -1,0 +1,62 @@
+# =========================================================
+# .gitignore — proyectos de analisis de datos (SQL / Power BI / Excel)
+# Regla de oro: los datos crudos NO se versionan; el codigo y el modelo SI.
+# =========================================================
+
+# --- Datos crudos: nunca se suben a GitHub ---
+data/raw/*
+!data/raw/LEEME.md
+
+# --- Datos intermedios generados localmente ---
+data/staging/*
+!data/staging/.gitkeep
+!data/staging/LEEME.md
+
+# --- Bases de datos y respaldos locales ---
+*.mdf
+*.ldf
+*.bak
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+*.accdb
+*.parquet
+
+# --- Power BI / Excel: archivos temporales y de usuario ---
+~$*.xlsx
+~$*.xls
+~$*.pbix
+*.pbix.bak
+**/.pbi/
+**/.pbi/localSettings.json
+*.tmp
+
+# --- Python (por si automatizas la carga) ---
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# --- Salidas pesadas ---
+*.zip
+*.csv.gz
+*.7z
+
+# --- Sistema operativo y editores ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/settings.json
+.idea/
+
+# --- Secretos: jamas ---
+.env
+*.env
+*.pem
+secrets/
