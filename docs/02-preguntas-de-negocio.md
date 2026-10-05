@@ -5,6 +5,10 @@
 
 **Regla de oro:** si la respuesta a una pregunta no cambia ninguna decisión del negocio, la pregunta no vale la pena. No la incluyas.
 
+> **Dos aclaraciones antes de empezar**
+> 1. Los archivos que aparecen como *Entregable* (`sql/30_analisis/...`) **todavía no existen**: se crean en la Fase 3. Son el destino de cada pregunta, no un enlace roto.
+> 2. Los nombres que verás escritos como en el archivo original — `Customer ID`, `StockCode`, `Description`, `InvoiceNo`, `UnitPrice` — se llaman en la base **`customer_id`, `stock_code`, `description`, `invoice`, `price`**. El mapeo completo está en [`docs/01-contexto-y-dataset.md`](01-contexto-y-dataset.md). **Cuando escribas SQL, usa siempre el nombre de la base.**
+
 ---
 
 ## Estructura de cada pregunta
