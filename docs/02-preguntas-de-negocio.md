@@ -78,8 +78,8 @@
 - **Decisión que cambia:** qué producto promocionar para captar y cómo armar los packs.
 - **Entregable:** `sql/30_analisis/50_productos.sql` + top de productos por primera compra.
 - **KPI:** `% de clientes cuya primera compra incluyó el producto` · `Pares de productos en la misma factura (co-ocurrencia)`.
-- **Grano:** `StockCode`.
-- **Trampa:** agrupar por `Description` en lugar de `StockCode`; incluir los códigos que **no son productos** (`POST`, `BANK CHARGES`, etc.); interpretar co-ocurrencia como recomendación sin mirar el volumen (dos productos raros que coinciden una vez aparecen como "el par estrella").
+- **Grano:** `stock_code` (en el archivo original: `StockCode`).
+- **Trampa:** agrupar por `description` en lugar de `stock_code`; incluir los códigos que **no son productos** (`POST`, `BANK CHARGES`, etc.); interpretar co-ocurrencia como recomendación sin mirar el volumen (dos productos raros que coinciden una vez aparecen como "el par estrella").
 - **Criterio de aceptación:** el ranking excluye los códigos administrativos y cada par reportado tiene un mínimo de facturas en común (define el umbral).
 
 ---
