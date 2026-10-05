@@ -42,9 +42,11 @@ SELECT '05 Sin retorno de carro (\\r) en country',
        (SELECT COUNT(*) FROM (SELECT country FROM stg_ventas_2009_2010 UNION ALL SELECT country FROM stg_ventas_2010_2011) x WHERE country LIKE '%\r%' OR country LIKE '%"%'), 0,
        IF((SELECT COUNT(*) FROM (SELECT country FROM stg_ventas_2009_2010 UNION ALL SELECT country FROM stg_ventas_2010_2011) x WHERE country LIKE '%\r%' OR country LIKE '%"%') = 0, 'OK', 'FALLA')
 UNION ALL
-SELECT '06 Fechas interpretadas (no nulas)',
-       (SELECT COUNT(*) FROM (SELECT invoice_date FROM stg_ventas_2009_2010 UNION ALL SELECT invoice_date FROM stg_ventas_2010_2011) x WHERE invoice_date IS NULL), 0,
-       IF((SELECT COUNT(*) FROM (SELECT invoice_date FROM stg_ventas_2009_2010 UNION ALL SELECT invoice_date FROM stg_ventas_2010_2011) x WHERE invoice_date IS NULL) = 0, 'OK', 'FALLA')
+SELECT '06 Fechas dentro del rango real (sin ceros)',
+       (SELECT COUNT(*) FROM (SELECT invoice_date FROM stg_ventas_2009_2010 UNION ALL SELECT invoice_date FROM stg_ventas_2010_2011) x
+        WHERE invoice_date IS NULL OR invoice_date < '2009-12-01' OR invoice_date > '2011-12-10'), 0,
+       IF((SELECT COUNT(*) FROM (SELECT invoice_date FROM stg_ventas_2009_2010 UNION ALL SELECT invoice_date FROM stg_ventas_2010_2011) x
+           WHERE invoice_date IS NULL OR invoice_date < '2009-12-01' OR invoice_date > '2011-12-10') = 0, 'OK', 'FALLA')
 UNION ALL
 SELECT '07 Fecha minima correcta',
        (SELECT MIN(DATE(invoice_date)) FROM stg_ventas_2009_2010), '2009-12-01',
@@ -70,9 +72,17 @@ SELECT '10 Paises distintos',
    Chequeo 04/05 en FALLA  -> cargaste con el terminador de linea equivocado.
                               Usa LINES TERMINATED BY '\r\n' y recarga.
    Chequeo 01/02/03 en FALLA -> el separador, el IGNORE 1 LINES o las comillas.
-   Chequeo 06/07 en FALLA  -> las fechas no se interpretaron. Formatea la columna
-                              InvoiceDate como yyyy-mm-dd hh:mm:ss en Excel ANTES
-                              de guardar el CSV, y recarga.
+   Chequeo 06/07/08 en FALLA -> LAS FECHAS ESTAN CORRUPTAS, y lo peor es que la
+                              carga NO te dio ningun error. Reproducido en MySQL
+                              8.0.46: la columna InvoiceDate del .xlsx viene con
+                              formato 'm/d/yy h:mm', y MySQL interpreta
+                                 '12/1/09 7:45'    ->  '2012-01-09 07:45:00'
+                                 '12/31/10 14:05'  ->  '0000-00-00 00:00:00'
+                              Solucion (verificada): recarga convirtiendo tu la fecha
+                                 SET invoice_date = STR_TO_DATE(TRIM(@fecha), '%m/%d/%y %H:%i')
+                              o reformatea la columna en Excel como yyyy-mm-dd hh:mm:ss
+                              antes de exportar. En cualquier caso, vuelve a correr
+                              este validador.
    Chequeo 09 en FALLA     -> los customer_id vacios se guardaron como 0 en lugar
                               de NULL (el cliente falso "0"). Recarga con el
                               patron NULLIF que esta en 00_crear_esquema.sql.
