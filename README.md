@@ -97,21 +97,26 @@ git checkout develop
 python tools/descargar_datasets.py
 # Copia online_retail_II.xlsx a data/raw/
 
-# 3. Crea el esquema en SQL Server
-#    Ejecuta sql/00_setup/00_crear_esquema.sql
-#    Carga las dos hojas en stg.ventas_2009_2010 y stg.ventas_2010_2011
+# 3. Guarda cada hoja del Excel como CSV UTF-8 en data/staging/
+#    (Year 2009-2010 y Year 2010-2011 por separado, ~500.000 filas cada una)
 
-# 4. Corre las consultas en orden
+# 4. Crea la base de datos y las tablas
+#    MySQL Workbench > File > Open SQL Script > sql/00_setup/00_crear_esquema.sql
+
+# 5. Carga los CSV en stg_ventas_2009_2010 y stg_ventas_2010_2011
+#    con el Table Data Import Wizard y VERIFICA el conteo de filas
+
+# 6. Corre las consultas en orden
 #    sql/10_staging -> sql/20_marts -> sql/30_analisis
 ```
 
-**Requisitos:** SQL Server 2019+ (o PostgreSQL 14+), Power BI Desktop, Excel.
+**Requisitos:** MySQL 8.0 + MySQL Workbench, Power BI Desktop, Excel.
 
 ---
 
 ## 8. Herramientas
 
-![SQL Server](https://img.shields.io/badge/SQL_Server-T--SQL-CC2927?style=flat-square)
+![MySQL](https://img.shields.io/badge/MySQL_8.0-4479A1?style=flat-square)
 ![Power BI](https://img.shields.io/badge/Power_BI-DAX-F2C811?style=flat-square)
 ![Excel](https://img.shields.io/badge/Excel-217346?style=flat-square)
 ![Git](https://img.shields.io/badge/Git-GitFlow-F05032?style=flat-square)
