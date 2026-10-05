@@ -127,7 +127,7 @@ Cada punto es una decisión que **debes** tomar, documentar en `docs/03-bitacora
 
 **Motor del proyecto: MySQL 8.0 con MySQL Workbench** (ya está instalado y el servicio está corriendo).
 
-1. Copia `online_retail_II.xlsx` desde `_datasets/online-retail-ii/` a `data/raw/`.
+1. Descarga el archivo original con el script del propio repositorio: `python scripts/descargar_datos.py`. Queda en `data/raw/`.
 2. Abre el archivo en Excel y guarda **cada hoja** como CSV UTF-8 en `data/staging/`. Son ~500.000 filas por hoja: guarda en `.csv`, nunca en `.xlsx`.
 3. En MySQL Workbench, abre y ejecuta `sql/00_setup/00_crear_esquema.sql`. Eso crea la base `portafolio_retail` y las tablas `stg_ventas_2009_2010`, `stg_ventas_2010_2011` y `dq_reglas`.
 4. Carga cada CSV con el **Table Data Import Wizard** (clic derecho sobre la tabla → Table Data Import Wizard) o con `LOAD DATA LOCAL INFILE` (el script trae el ejemplo exacto). Acuérdate de mapear `Customer ID` al campo `customer_id`. Carga **todo como texto** en esta primera pasada: no quieres que el motor decida los tipos por ti.

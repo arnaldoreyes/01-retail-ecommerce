@@ -93,9 +93,8 @@ git clone <url-del-repo>
 cd 01-retail-ecommerce
 git checkout develop
 
-# 2. Descarga el dataset original (desde la raiz del portafolio)
-python tools/descargar_datasets.py
-# Copia online_retail_II.xlsx a data/raw/
+# 2. Descarga el dataset original (queda en data/raw/)
+python scripts/descargar_datos.py
 
 # 3. Guarda cada hoja del Excel como CSV UTF-8 en data/staging/
 #    (Year 2009-2010 y Year 2010-2011 por separado, ~500.000 filas cada una)
