@@ -7,7 +7,7 @@
 
 ## El problema
 
-Un retailer mayorista de regalos y artículos de hogar (Reino Unido) factura varios millones de libras al año y vende a más de 40 países. Su gerente comercial tiene una intuición incómoda: *"veo pedidos todas las semanas, pero también veo devoluciones y clientes que compraron una vez y nunca volvieron. No sé quién me sostiene el negocio ni a quién estoy a punto de perder"*.
+Un retailer mayorista de regalos y artículos de hogar (Reino Unido) factura varios millones de libras al año y vende a más de 40 países. Su gerente comercial tiene una intuición incómoda: _"veo pedidos todas las semanas, pero también veo devoluciones y clientes que compraron una vez y nunca volvieron. No sé quién me sostiene el negocio ni a quién estoy a punto de perder"_.
 
 **Pregunta central:** ¿cuál es la facturación **neta** real, qué clientes la sostienen y qué parte de esa facturación está en riesgo de fuga?
 
@@ -15,18 +15,18 @@ Un retailer mayorista de regalos y artículos de hogar (Reino Unido) factura var
 
 ## Los datos
 
-| | |
-|---|---|
-| **Fuente** | [Online Retail II — UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii) |
-| **Licencia** | CC BY 4.0 |
-| **Volumen** | 1.067.371 líneas de factura · 2 hojas de Excel |
-| **Periodo** | 2009-12-01 → 2011-12-09 |
-| **Grano** | 1 fila = un producto dentro de una factura |
-| **Moneda** | Libra esterlina (GBP) |
+|              |                                                                                                                |
+| ------------ | -------------------------------------------------------------------------------------------------------------- |
+| **Fuente**   | [Online Retail II — UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii) |
+| **Licencia** | CC BY 4.0                                                                                                      |
+| **Volumen**  | 1.067.371 líneas de factura · 2 hojas de Excel                                                                 |
+| **Periodo**  | 2009-12-01 → 2011-12-09                                                                                        |
+| **Grano**    | 1 fila = un producto dentro de una factura                                                                     |
+| **Moneda**   | Libra esterlina (GBP)                                                                                          |
 
 Diccionario de columnas y notas de calidad del dato: [`docs/diccionario-de-datos.md`](docs/diccionario-de-datos.md)
 
-**Cita:** Chen, D. (2012). *Online Retail II* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5CG6D
+**Cita:** Chen, D. (2012). _Online Retail II_ [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5CG6D
 
 ---
 
@@ -55,7 +55,10 @@ Cada decisión que cambia un número, con la alternativa que se descartó.
 
 ## Hallazgos
 
-_Pendiente: se completa al cerrar el análisis._
+ 1. Son 8 dias de cruce que tienen ambas hojas (IMPORTANTE: El dia 2010-12-04 no hay registro de facturacion/ventas)
+ 2. 22.523 Filas duplicadas en total
+ 3. Son las mismas facturas: mismo numero, mismo dinero.
+ 4. Ambas copias son idénticas: mismo número de facturas y mismo importe. Conservo una sola, la de la hoja 2009-2010, porque en esa hoja esos días cierran su periodo. Si se mantuvieran las dos, toda cifra de 2010-2011 quedaría duplicada.
 
 ---
 

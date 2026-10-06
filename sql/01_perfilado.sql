@@ -54,9 +54,20 @@ SELECT '09 Paises distintos',
 /* ============================================================================
    2. SOLAPE ENTRE LAS DOS HOJAS
    ============================================================================ */
+-- Rango de fechas de la tabla ventas
+SELECT MIN(invoice_date), MAX(invoice_date), hoja FROM ventas GROUP BY hoja;
+-- Numero de filas que tienen filas repetidas por el rango de fecha presente en las 2 hojas
+SELECT DATE(invoice_date) AS fecha, hoja, COUNT(*) FROM ventas WHERE DATE(invoice_date) BETWEEN '2010-12-01' AND '2010-12-09'  GROUP BY hoja, DATE(invoice_date);
+-- Verficar si hay fechas unicas
+SELECT DATE(invoice_date) AS fecha, hoja FROM ventas GROUP BY hoja, DATE(invoice_date) HAVING COUNT(*) = 1; 
+-- Vereficar si las facturas presentes en las fechas repetidas son las mismas
+SELECT DATE(invoice_date), COUNT(DISTINCT invoice), ROUND(sum(quantity*price), 2), hoja FROM ventas WHERE DATE(invoice_date) BETWEEN '2010-12-01' AND '2010-12-09'  GROUP BY hoja, DATE(invoice_date);
+-- Numero de filas repetidas en cada hoja correspondientes al numero de fechas
+SELECT hoja, COUNT(*) FROM ventas WHERE DATE(invoice_date) BETWEEN '2010-12-01' AND '2010-12-09'  GROUP BY hoja;
 
--- TODO
-
+-- Son 8 dias de cruce que tienen ambas hojas (IMPORTANTE: El dia 2010-12-04 no hay registro de facturacion/ventas)
+-- 22.523 Filas duplicadas en total
+-- Son las mismas facturas: mismo numero, mismo dinero.
 
 /* ============================================================================
    3. CALIDAD DE LAS COLUMNAS
