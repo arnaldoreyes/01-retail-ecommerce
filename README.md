@@ -49,16 +49,13 @@ Cada decisión que cambia un número, con la alternativa que se descartó.
 |---|---|---|
 | Las fechas se convierten durante la carga con `STR_TO_DATE` | Cargarlas directo a la columna `DATETIME` | El CSV exportado desde Excel trae el formato `m/d/yy h:mm` y MySQL lo interpreta mal **sin dar error**: `12/1/09` se guarda como `2012-01-09`. Verificado en MySQL 8.0.46 |
 | Los `customer_id` vacíos se cargan como `NULL` con `NULLIF` | Dejarlos como vienen | Cargados directo a una columna numérica, MySQL los convierte en `0` e inventa un cliente con ~243.000 filas y 1,7 millones de libras |
-| _pendiente_ | | |
+| Descartar la copia de la hoja 2010-2011 en los 8 días del cruce | Conservar esa copia y descartar la de 2009-2010 | Las dos copias son idénticas: mismo número de facturas y mismo importe. Si se mantienen las dos, toda cifra de 2010-2011 queda duplicada |
 
 ---
 
 ## Hallazgos
 
- 1. Son 8 dias de cruce que tienen ambas hojas (IMPORTANTE: El dia 2010-12-04 no hay registro de facturacion/ventas)
- 2. 22.523 Filas duplicadas en total
- 3. Son las mismas facturas: mismo numero, mismo dinero.
- 4. Ambas copias son idénticas: mismo número de facturas y mismo importe. Conservo una sola, la de la hoja 2009-2010, porque en esa hoja esos días cierran su periodo. Si se mantuvieran las dos, toda cifra de 2010-2011 quedaría duplicada.
+_Pendiente: se completa al cerrar el análisis._
 
 ---
 
