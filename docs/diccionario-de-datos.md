@@ -44,6 +44,23 @@ de 1,7 millones de libras de facturación.
 
 ---
 
+## Los tres estados de un campo
+
+No son lo mismo, y en este dataset el detalle decide una de las decisiones de limpieza.
+
+| Estado | Qué es | En esta tabla |
+|---|---|---|
+| `NULL` | **ausencia de valor**: se desconoce | los `customer_id` sin identificar y las `description` sin nombre |
+| cadena vacía `''` | **un valor**: texto de longitud 0 | ninguno: se convirtieron a `NULL` durante la carga |
+| `0` | **un valor numérico real** | ninguno: aparecerían si la carga no usara `NULLIF` |
+
+- `NULL` no es igual a nada, ni siquiera a otro `NULL`. `COUNT(columna)` lo ignora; `COUNT(*)` no.
+- La cadena vacía **sí es un valor**: `'' = ''` es verdadero y `COUNT(columna)` la cuenta.
+- Una columna **numérica** no puede guardar una cadena vacía: el motor la convierte en `0` o en `NULL`. En `customer_id` solo puede haber `NULL`, `0` o un id real. En `description` (texto) puede haber `NULL` **y** `''`.
+- Por eso, cuando en la documentación se lee "el campo llega vacío", significa **vacío en el CSV de origen**, no `NULL` en la base.
+
+---
+
 ## Valores de referencia
 
 Sirven para comprobar que la carga quedó bien.
