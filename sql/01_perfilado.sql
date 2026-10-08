@@ -107,7 +107,7 @@ SELECT ROUND(SUM((customer_id IS NULL) * quantity * price), 2) AS dinero_sin_cli
 SELECT  ROUND(100 * SUM((customer_id IS NULL) * quantity * price) / SUM(quantity * price), 2)  AS porcentaje_sobre_facturacion FROM ventas_sin_superposicion;
 
 /*
-5. ¿Un mismo stock_code aparece con descripciones distintas?
+Consistencia de description por stock_code (pregunta 5 de la escalera)
 
 	-- CUANTOS:  1.232 de 5.305 codigos (23,2%) tienen mas de una descripcion.
 	-- QUE SON:  no son nombres alternativos: el campo description se usa como nota libre (estado, ajustes, canal, formato).
