@@ -5,21 +5,21 @@
 ## Fase del proyecto
 
 - [ ] Fase 1 - Perfilado y diccionario de datos
-- [ ] Fase 2 - Limpieza y modelo (staging / marts)
+- [ ] Fase 2 - Limpieza y transformacion
 - [ ] Fase 3 - Analisis y KPIs
 - [ ] Fase 4 - Dashboard Power BI
 - [ ] Fase 5 - Informe y entrega
 
-**Pregunta de negocio que responde este PR:** #
+**Pregunta de negocio que responde este PR:** <!-- el numero, o "ninguna: es preparacion del dato" -->
 
 ## Como lo verifique (sin esto NO se mergea)
 
-- [ ] El script/query/DAX corre sin errores de principio a fin
-- [ ] Valide los totales por una segunda via (Excel, conteo manual, otro query)
-- [ ] Agregue captura en `reports/figures/` con nombre descriptivo
-- [ ] Documente **que** hace y **por que** en `docs/`
+- [ ] La base de este PR es `develop`, no `main`
+- [ ] El script o la consulta corre sin errores de principio a fin
+- [ ] Valide los totales por una segunda via (Excel, conteo manual, otra consulta)
+- [ ] Documente **que** hace y **por que** (en el README o en `docs/`)
 
-Evidencia (pega el resultado, el conteo de filas o la captura):
+Evidencia (resultado de la consulta, conteo de filas o captura):
 
 ```
 ```
@@ -34,4 +34,4 @@ Evidencia (pega el resultado, el conteo de filas o la captura):
 
 ## Siguiente paso
 
-- [ ]
+<!-- Una linea: que viene despues de este PR. -->
