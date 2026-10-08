@@ -50,7 +50,7 @@ Cada decisión que cambia un número, con la alternativa que se descartó.
 | Las fechas se convierten durante la carga con `STR_TO_DATE` | Cargarlas directo a la columna `DATETIME` | El CSV exportado desde Excel trae el formato `m/d/yy h:mm` y MySQL lo interpreta mal **sin dar error**: `12/1/09` se guarda como `2012-01-09`. Verificado en MySQL 8.0.46 |
 | Los `customer_id` vacíos se cargan como `NULL` con `NULLIF` | Dejarlos como vienen | Cargados directo a una columna numérica, MySQL los convierte en `0` e inventa un cliente con ~243.000 filas y 1,7 millones de libras |
 | Descartar la copia de la hoja 2010-2011 en los 8 días del cruce | Conservar esa copia y descartar la de 2009-2010 | Las dos copias son idénticas: mismo número de facturas y mismo importe. Si se mantienen las dos, toda cifra de 2010-2011 queda duplicada |
-
+| Agrupar por stock_code, nunca por description | Usar description como clave del producto | 1.232 de 5.305 códigos tienen más de una descripción: el campo también carga notas de estado (damaged), canal (amazon) y ajustes. Usarlo como clave fragmenta el mismo producto en varias filas |
 ---
 
 ## Hallazgos
